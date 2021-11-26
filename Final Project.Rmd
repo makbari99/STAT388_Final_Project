@@ -8,7 +8,21 @@ output: html_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
+Code for Predicting NYC AirBnB Prices:
+```{r}
+#importing datasets
+train = read.csv("AirBnB/train.csv", header = T)
+test = read.csv("AirBnB/test.csv",header = T)
+```
 
 ```{r}
-
+#beginning EDA
+head(train)
+plot(train$price)
+for (i in 1:ncol(train)) {
+print(colnames(train)[i])
+print(sum(complete.cases(train[,i])))
+}
+train$neighbourhood = as.factor(train$neighbourhood)
+barplot(table(train$neighbourhood), table(train$price))
 ```
