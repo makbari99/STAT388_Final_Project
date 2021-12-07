@@ -25,4 +25,39 @@ print(sum(complete.cases(train[,i])))
 }
 train$neighbourhood = as.factor(train$neighbourhood)
 barplot(table(train$neighbourhood), table(train$price))
+library(VIM)
+matrixplot(train)
+VIM::aggr(train)
+train = train[,c(1,5:12,14:16)]
+```
+
+```{r}
+#imputing missing data
+library(mice)
+fcs = mice(train[,c(1:8)], m=5, method="pmm")
+train_comp = complete(fcs,2)
+train$reviews_per_month = train_comp$reviews_per_month
+VIM::aggr(train)
+train = train[,c(1,2,4:11)]
+```
+
+```{r}
+#creating model
+set.seed(1111)
+ind = sample(34226,23957)
+train_cv = train[ind,]
+test_cv = train[-ind,]
+```
+
+```{r}
+library(rpart)
+library(randomForest)
+
+#rf
+model = randomForest(price~., data=train_cv)
+
+varImpPlot(model)
+plot(model)
+preds = predict(model, test_cv)
+mean(preds==test_cv$price)
 ```
