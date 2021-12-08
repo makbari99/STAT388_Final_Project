@@ -59,8 +59,9 @@ model = randomForest(price~., data=train_cv)
 varImpPlot(model)
 plot(model)
 preds = predict(model, newdata=test_cv, type = "class")
-#mean(preds==test_cv$price)
+
 preds_final = predict(model, newdata=test, type = "class")
-#sub$price = preds_final
-write.csv(preds_final, file = "C:\\Users\\admin\\Desktop\\Course Work\\STAT 388\\Final Project\\AirBnB\\finalpredictions.csv", row.names = FALSE)
+test$price = preds_final
+sub = test[,c(1,16)]
+write.csv(sub, file = "C:\\Users\\admin\\Desktop\\Course Work\\STAT 388\\Final Project\\AirBnB\\finalpredictions.csv", row.names = FALSE)
 ```
