@@ -1,0 +1,233 @@
+---
+title: "STAT 338 Project"
+author: "Yamini Adusumilli & Matin Akbari"
+date: "12/14/2021"
+output:
+  html_document:
+    toc: yes
+    toc_depth: 3
+    toc_float: yes
+  word_document:
+    toc: yes
+    toc_depth: '3'
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Introduction
+ 
+The SLICED s01e04 Kaggle competition is about predicting rainfall in Australia using meteorological data. The provided training data has 34,191 observations while the provided test has 14,653 observations. There are 24 variables in total. The variable _id_ is the unique  
+identifier. The _date_ variable indicates the day the data was collected on and the variable _location_ indicates which city in Australia the data was collected in. The variables _max_temp_ and _min_temp_ indicate the maximum and minimum temperatures in degrees Celsius respectively. _Rainfall_ is the amount of rainfall recorded for the day in mm, _evaporation_ is the pan evaporation in mm, and _Sunshine_ is the number of hours of sunshine in the day. There is also some information about the wind. _wind_gust_dir_ is the direction of the wind gust, _wind_gust_speed_ is the speed (km/h) of the wind gust, _wind_dir9am_ is the direction of the wind at 9 AM, _wind_dir3pm_ is the direction of the wind at 3 PM, _wind_speed9am_ is the wind gust speed at 9am, and _wind_speed3pm_ is the wind gust speed at 3 PM. _Humidity9am_ and _humidity3pm_ are the percent humidities at 9 AM and 3 PM respectively. _Pressdure9am_ and _pressure3pm_ are the atmospheric pressures at 9 AM and 3 PM respectively. _Cloud9am_ and _cloud3pm_ are the fraction of sky obscured by cloud at 9 AM and 3 PM respectively. This is measured in "oktas", which are a unit of eighths. It records how many eighths of the sky are obscured by cloud. A 0 measure indicates completely clear sky while an 8 indicates that it is completely overcast. _Temp9am_ and _temp3pm_ are the temperatures in degrees Celsius at 9 AM and 3 PM respectively. Lastly, there are the _rain_today_ and _rain_tomorrow_ variables. _Rain_today_ is 1 if precipitation exceeds 1 mm in 24 hours, otherwise it is 0. _Rain_tomorrow_ is the response variable which indicates the amount of rain the next day in mm. The objective is to use classification to predict the probabilities of rainfall the next day. 
+
+# Methods 
+
+Prior to building a classification model, I did some exploratory data analysis to get an understanding of the data. I plotted histograms of all of the variables to get assess the distributions and any problems. Given the context of the study, the different types of variables, and potential missing data, I determined that there were no alarming issues about the histograms. The second step was to assess whether there was any missing data and how to handle missing any potential missing data in the training data set. I plotted a chart using the library _naniar_ that gave me an overview of how much data was missing in each variable. The histograms and the missing data chart can be found in the appendix. After further analysis, I determined that there was missing data in all the variables other than _id_, _date_, and _location_. It should be noted that the variable _evaporation_ was missing 98.78% of data and the variable _sunshine_ was missing 98.17% of data. Given the amount of data that was missing in these two variables, I decided to drop them because I believed they would negatively affect the model. Next, I had to handle the missing data for all of the other variables. I decided to use mean imputation for the numerical variables and mode imputation for the categorical variables. After handling the missing data, the data was ready to use for classification. For classification, I decided to use Random Forest from the library _randomForest_. Random Forest is a flexible and supervised machine learning algorithm which can be used for both classification and regression tasks. Supervised learning is when a computer algorithm is trained on input data that has been labeled for a particular output as opposed the unsupervised learning where the the algorithm is presented with unlabeled data and is designed to detect patterns or similarities on its own. As we learned in class, the Random Forest algorithm has an ensemble of decision trees, usually trained with the "bagging" method. The general idea of the bagging method is that a combination of learning models increases the overall result. So, ultimately, the Random Forest algorithm builds multiple decision trees and merges them together to get a more accurate and stable prediction for a given response variable. Prior to using Random Forest, I converted the categorical variables without many levels to factors. Next, I ran the data through random forest using default parameters. After the data went through I calculated the values for the rain_tomorrow column. At first, I calculated 0's and 1's because I thought the rain_tomorrow variable was supposed to have binary values like the rain_today column. Doing that, gave me a very high log loss score on Kaggle. Given that the log loss score is supposed to be very low, I tried running the data through Random Forest using different tuning parameters, but was unable to lower the log loss score. So, next, I tried predicting the probabilities of the rain_tomorrow column instead of binary values. I did this using _type = "prob"_ in my predict function. Doing this gave me a good log loss score on Kaggle, 0.33223.
+
+# Results
+
+The results of my missing data analysis can be summarized by the chart below. 
+![MissingData](missing_data_chart.png)
+We can see the percentage of missing data for evaporation and sunshine is very high. That is why I decided to drop those variables. After assessing the missing data, I did some EDA to assess the distributions of the variables. The results of my EDA can be found in the Appendex under 'EDA'. The next step was to handle the missing data, so I used mean imputation for the numerical variables and mode imputation for the categorical variables. For the train data, the result of the the most frequent wind gust direction was "W". The most frequent wind direction at 3 PM was "SE" and the most frequent wind direction at 9 AM was "N". For the rain_today column, the most frequent value between 0 and 1 was 0. Next, I ran the data through the random forest algorithm and got the results below. 500 tress were used and the number of variables tried at each split was 4. The OOB estimate of the error rate and the confusion matrix can also be seen below. 
+![MissingData](random_forest.png)
+Next, I used the training data to predict the test data and ran my results through Kaggle. The log loss score I received was 0.33223 as seen below.
+![MissingData](Kaggle_Score.png)
+This score is notably lower than the sample_submission.csv score (0.69314) which had probabilities of 0.5 for every observation. So, I determined that the random forest method model appropriately predicted the probabilities of raining the next day in Australia.
+
+# Conclusion
+
+The overall objective of this project was to use a classification technique to predict the rain_tomorrow column and get a log loss score smaller than the sample_submission score. After doing some research, I decided to use Random Forest as my classification method for this project. However, before I ran the data through Random Forest, I had to do some clean up. First I assessed whether there were any missing data points. Almost all of the variables had missing so I either dropped the variables, used mean imputation, or mode imputation depending on the type of variable and the amount of data missing. I also did some EDA to get an idea of what the data looks like. Then, the data was ready to use. So, I ran it through the random forest algorithm and used my results to predict on the test data. I predicted probabilities for the rain_tomorrow column and ran my results through Kaggle to get a log loss score of 0.33223. If I had more time, I would have liked to test out other models other than Random Forest. In particular, I am interested in what the score would have been if I used Logistic Regression or Support Vector Machines instead. I would also like to repeat this analysis for other countries or cities. Especially places with a lot of rainfall or places with little rainfall to see if the random forest algorithm would predict accurately. I am also interested in doing further analysis about what times of the year Australia sees the most rain. I think it would be very interesting to identify any patterns and make some data visualizations about any trends we see.
+
+# Appendix 
+
+Below is the code.
+
+```{r}
+library(naniar)
+library(randomForest)
+library(caret)
+
+# loading data sets
+
+train = read.csv("train.csv")
+test = read.csv("test.csv")
+head(train)
+head(test)
+```
+
+```{r}
+colnames(train)
+colnames(test)
+
+dim(train)
+dim(test)
+
+# checking missing value counts
+
+na_count <-sapply(train, function(y) sum(length(which(is.na(y)))))
+na_count <- data.frame(na_count)
+na_count
+
+na_count <-sapply(test, function(y) sum(length(which(is.na(y)))))
+na_count <- data.frame(na_count)
+na_count
+
+# dropping id because it is a unique identifier
+# dropping 'evaporation' because 98.78% values are missing in the train data set
+# dropping 'sunshine' because 98.17% values are missing in the train data set
+
+drops <- c("id","evaporation","sunshine")
+train <- train[ , !(names(train) %in% drops)]
+test <- test[ , !(names(test) %in% drops)]
+
+# adding a rain_tomorrow column to the test data set
+
+test$rain_tomorrow <- NA
+```
+
+```{r}
+# EDA 
+
+# combining train and test for EDA
+
+train2 <- train
+data <- rbind(test, train2)
+
+# histograms of all variables
+
+par(mfrow = c(2,2))
+
+hist(data$min_temp)
+hist(data$max_temp)
+hist(data$rainfall)
+hist(data$wind_gust_speed)
+hist(data$wind_speed9am)
+hist(data$wind_speed3pm)
+hist(data$humidity3pm)
+hist(data$humidity9am)
+hist(data$pressure9am)
+hist(data$pressure3pm)
+hist(data$cloud9am)
+hist(data$cloud3pm)
+hist(data$temp9am)
+hist(data$temp3pm)
+hist(data$rain_today)
+hist(data$rain_tomorrow)
+
+par(oma=c(2,0,0,0))    
+barplot(table(data$wind_gust_dir), space = 0,
+              ylab = "Frequency", main = "Wind Gust Direction",
+              border="black", col="grey",las=2) 
+box()
+
+par(oma=c(2,0,0,0))    
+barplot(table(data$wind_dir9am), space = 0,
+              ylab = "Frequency", main = "Wind Direction 9 AM",
+              border="black", col="grey",las=2) 
+box()
+par(oma=c(2,0,0,0))    
+barplot(table(data$wind_dir3pm), space = 0,
+              ylab = "Frequency", main = "Wind Direction 3 PM",
+              border="black", col="grey",las=2) 
+box()
+
+par(oma=c(2,0,0,0))    
+barplot(table(data$location), space = 0,
+              ylab = "Frequency", main = "Location",
+              border="black", col="grey",las=2) 
+box()
+
+par(oma=c(2,0,0,0))    
+barplot(table(data$date), space = 0,
+              ylab = "Frequency", main = "Date",
+              border="black", col="grey",las=2) 
+box()
+
+# visualizing missing data
+
+vis_miss(data, warn_large_data = FALSE)
+```
+
+```{r}
+# handling missing values 
+
+train$min_temp[is.na(train$min_temp)]<-mean(train$min_temp,na.rm=TRUE)
+train$max_temp[is.na(train$max_temp)]<-mean(train$max_temp,na.rm=TRUE)
+train$rainfall[is.na(train$rainfall)]<-mean(train$rainfall,na.rm=TRUE)
+train$wind_gust_speed[is.na(train$wind_gust_speed)]<-mean(train$wind_gust_speed,na.rm=TRUE)
+train$wind_speed9am[is.na(train$wind_speed9am)]<-mean(train$wind_speed9am,na.rm=TRUE)
+train$wind_speed3pm[is.na(train$wind_speed3pm)]<-mean(train$wind_speed3pm,na.rm=TRUE)
+train$humidity3pm[is.na(train$humidity3pm)]<-mean(train$humidity3pm,na.rm=TRUE)
+train$humidity9am[is.na(train$humidity9am)]<-mean(train$humidity9am,na.rm=TRUE)
+train$pressure3pm[is.na(train$pressure3pm)]<-mean(train$pressure3pm,na.rm=TRUE)
+train$pressure9am[is.na(train$pressure9am)]<-mean(train$pressure9am,na.rm=TRUE)
+train$cloud9am[is.na(train$cloud9am)]<-mean(train$cloud9am,na.rm=TRUE)
+train$cloud3pm[is.na(train$cloud3pm)]<-mean(train$cloud3pm,na.rm=TRUE)
+train$temp9am[is.na(train$temp9am)]<-mean(train$temp9am,na.rm=TRUE)
+train$temp3pm[is.na(train$temp3pm)]<-mean(train$temp3pm,na.rm=TRUE)
+
+table(train$wind_gust_dir)
+train$wind_gust_dir[is.na(train$wind_gust_dir)]<-"W"
+table(train$wind_dir3pm)
+train$wind_dir3pm[is.na(train$wind_dir3pm)]<-"SE"
+table(train$wind_dir9am)
+train$wind_dir9am[is.na(train$wind_dir9am)]<-"N"
+table(train$rain_today)
+train$rain_today[is.na(train$rain_today)]<-0
+
+test$min_temp[is.na(test$min_temp)]<-mean(test$min_temp,na.rm=TRUE)
+test$max_temp[is.na(test$max_temp)]<-mean(test$max_temp,na.rm=TRUE)
+test$rainfall[is.na(test$rainfall)]<-mean(test$rainfall,na.rm=TRUE)
+test$wind_gust_speed[is.na(test$wind_gust_speed)]<-mean(test$wind_gust_speed,na.rm=TRUE)
+test$wind_speed9am[is.na(test$wind_speed9am)]<-mean(test$wind_speed9am,na.rm=TRUE)
+test$wind_speed3pm[is.na(test$wind_speed3pm)]<-mean(test$wind_speed3pm,na.rm=TRUE)
+test$humidity3pm[is.na(test$humidity3pm)]<-mean(test$humidity3pm,na.rm=TRUE)
+test$humidity9am[is.na(test$humidity9am)]<-mean(test$humidity9am,na.rm=TRUE)
+test$pressure3pm[is.na(test$pressure3pm)]<-mean(test$pressure3pm,na.rm=TRUE)
+test$pressure9am[is.na(test$pressure9am)]<-mean(test$pressure9am,na.rm=TRUE)
+test$cloud9am[is.na(test$cloud9am)]<-mean(test$cloud9am,na.rm=TRUE)
+test$cloud3pm[is.na(test$cloud3pm)]<-mean(test$cloud3pm,na.rm=TRUE)
+test$temp9am[is.na(test$temp9am)]<-mean(test$temp9am,na.rm=TRUE)
+test$temp3pm[is.na(test$temp3pm)]<-mean(test$temp3pm,na.rm=TRUE)
+
+table(test$wind_gust_dir)
+test$wind_gust_dir[is.na(test$wind_gust_dir)]<-"W"
+table(test$wind_dir3pm)
+test$wind_dir3pm[is.na(test$wind_dir3pm)]<-"SE"
+table(test$wind_dir9am)
+test$wind_dir9am[is.na(test$wind_dir9am)]<-"N"
+table(test$rain_today)
+test$rain_today[is.na(test$rain_today)]<-0
+```
+
+```{r}
+# fitting random forest 
+
+train = as.data.frame(train)
+train$wind_gust_dir = factor(train$wind_gust_dir) 
+train$wind_dir3pm = factor(train$wind_dir3pm) 
+train$wind_dir9am = factor(train$wind_dir9am) 
+train$rain_today = factor(train$rain_today) 
+train$rain_tomorrow = factor(train$rain_tomorrow)
+
+test = as.data.frame(test)
+test$wind_gust_dir = factor(test$wind_gust_dir) 
+test$wind_dir3pm = factor(test$wind_dir3pm) 
+test$wind_dir9am = factor(test$wind_dir9am) 
+test$rain_today = factor(test$rain_today) 
+test$rain_tomorrow = factor(test$rain_tomorrow)
+
+rf <- randomForest(rain_tomorrow~., data=train) 
+print(rf)
+
+# predicting probabilities 
+
+rf_pred <- predict(rf, test, type = "prob")
+
+results = as.data.frame(rf_pred)
+
+write.csv(results,"rf_results_final.csv", row.names = TRUE)
+
+# kaggle score: 0.33223
+```
