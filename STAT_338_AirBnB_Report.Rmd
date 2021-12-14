@@ -18,11 +18,16 @@ Before I could go ahead and build a regression model, I needed to become familia
 
 # Results 
 
-Before I built the model, I wanted to see how much missingness the dataset had. 
+Before I built the model, I wanted to see how much missingness the dataset had. The graph on right shows porportion of missingness. The graph on the right compares the proportion of missingness (in red) to the not missingness (in blue). There is a lot of red in the _last_review_ and _review_per_month_. The graph on the left shows the identification variables as not having a lot of missingness. That is why I decided not to worry about the identification variables but to then impute _reviews_per_month_.
 ![Missing data](C:\Users\admin\Desktop\Course Work\STAT 388\Final Project\AirBnB\missing.png)
+After building my model, I submitted my predictions to the Kaggle Contest. My score was 0.43240
+![My Kaggle Score](C:\Users\admin\Desktop\Course Work\STAT 388\Final Project\AirBnB\missing.png)
+This is score is between second and third place. While it is not the best score, it is still reasonable. 
 
 # Conclusions/Future work 
 
+In conclusion, I took the dataset from the the SLICED s01e05 Kaggle Compeition. I imputed the missing data using _mice_ and removed predictors that would not contribute to a strong model. I then built a model using _Random Forest_. After building my model, I submitted my predictions for the price to Kaggle. This gave me a final score of 0.43240. In the future, I would like to compare this Random Forest model to a single decision tree as well as pruned tree to see the difference in accuracy. I would have also liked to see about other ways to get a better prediction accuracy. If I had more time, I would have liked to build a model using Generalized Additive Models (GAMs). 
 
 # Appendix
 
+Link to Github: https://github.com/makbari99/STAT388_Final_Project
