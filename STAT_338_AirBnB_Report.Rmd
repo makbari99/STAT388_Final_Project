@@ -30,5 +30,4 @@ In conclusion, I took the dataset from the the SLICED s01e05 Kaggle Compeition. 
 
 # Appendix
 
-
 Link to Github: https://github.com/makbari99/STAT388_Final_Project
