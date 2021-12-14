@@ -1,0 +1,28 @@
+---
+title: "STAT_338_AirBnB_Report"
+author: "Yamini and Matin"
+date: "12/13/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Introduction
+
+The SLICED s01e05 Kaggle Compeition is using a dataset to predict Airbnb listing prices. The data is collected from neighborhoods in New York City. The data set has a total of 34226 observations in the training dataset and a total of 14669 observations in the testing data set. The prices of the Airbnb listings are a continous variable. There are 15 variables in the dataset that can be used to determine the outcome. A typical variable that is found in almost every dataset is the unique idetifier, here it is known simply as _id_, along with _name_ (which is the title of the listing), _host_id_ (which is the identifier for the person renting out the listing), and _host_name_ (which is the name of the person renting out the listing). A few important variables might be: _neighborhood_ and _neighborhood_group_ (these are categorical variables to denote a general and specific location, of the listing, within New York City respectively), _latitude_ _longitude_ (which are the coordinates of the listing), _room_type_ (which is a categorical variable to denote the type of living space that is being listed), _number of reviews_ (which is the number of reviews the listing has gotten), _reviews_per_month_ (which is how many reviews the listing gets per month), _availibilty_365_ (which denotes how many days out of the year the listing is available). 
+
+# Methods
+Before I could go ahead and build a regression model, I needed to become familiar with the dataset. I started by plotting some bar graphs and histograms to see the distribution of the data. Rather than do this for every variable, I wanted to know the distribution of price and neighborhood. This would tell me how the listings were priced and generally where the listings were located. I also turned the categorical variables into factors. Next, I also needed to figure out if the dataset had any missing observations, I used the package _VIM_ along with a _matrix plot_ to see if any variables had missing data and how much was missing. I saw that the data did have missing values across a few predictors. I saw that _name_, _host_name_, _last_review_ (which denotes the last time a review was left for the listing), and _reviews_per_month_ had missing values. The proportion of missing data for _name_ and _host_name_ was insignificant. The _name_ variable had 9 values missing out of 34226. The _host_name_ variable had 14 missing values out of 34226. I decided not to worry about these two variables for now. The other two variables had more missing. Both the _last_review_ and _reviews_per_month_ variables had 7008 missing. I decided that I needed to impute the missing values for _last_review_ and _reviews_per_month_. I used the _mice_ package to achieve this. I decided to use the default parameters for the function. However, I ran into a problem. The _mice_ function was not imputing the _last_review_ variable. I decided to drop this variable for now. the _mice_ function did impute the _reviews_per_month_ variable without any problem. I also decided to drop some other variables. I dropped the identification variables and kept _id_. I also decided to drop _neighborhood_group_ since it was a categorical variable with 73 categories. The next step was to build my regression model. I decided to use a Random Forest from the _RandomForest_ library. One reason was that Random Forest has built in feature selection in order to identify which features has more importance. Also, in addition to a single tree, a Random Forest creates an ensemble of decision trees. This combination of multiple decision trees produces a more accurate response as compared to a single tree. I built the model using the default parameters. 
+
+# Results 
+
+Before I built the model, I wanted to see how much missingness the dataset had. 
+![Missing data](C:\Users\admin\Desktop\Course Work\STAT 388\Final Project\AirBnB\missing.png)
+
+# Conclusions/Future work 
+
+
+# Appendix
+
